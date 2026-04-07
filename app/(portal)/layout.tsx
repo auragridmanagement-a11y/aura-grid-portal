@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import { headers } from "next/headers";
+import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/dashboard", label: "Dashboard" },
@@ -9,13 +11,12 @@ const links = [
   { href: "/packages", label: "Packages" },
 ];
 
-export default async function PortalLayout({
+export default function PortalLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname =
-    (await headers()).get("x-invoke-path") || "/dashboard";
+  const pathname = usePathname();
 
   return (
     <main className="min-h-screen bg-[#f5f4f0] p-8">
@@ -28,6 +29,7 @@ export default async function PortalLayout({
             <nav className="mt-8 space-y-2 text-sm">
               {links.map((link) => {
                 const active = pathname === link.href;
+
                 return (
                   <Link
                     key={link.href}
