@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 
 const links = [
   { href: "/dashboard", label: "Dashboard" },
@@ -17,7 +15,7 @@ export default function PortalLayout({
 }) {
   return (
     <main className="min-h-screen bg-[#f5f4f0] p-8">
-      <div className="flex min-h-[700px] overflow-hidden rounded-2xl border border-[#e8e6e0]">
+      <div className="relative flex min-h-[700px] overflow-hidden rounded-2xl border border-[#e8e6e0] bg-white shadow-sm">
         <aside className="w-60 border-r border-[#e8e6e0] bg-[#f9f8f5] p-6">
           <h1 className="text-sm font-semibold">Aura Grid</h1>
           <p className="text-xs text-[#7A8394]">Client Portal</p>
@@ -27,7 +25,7 @@ export default function PortalLayout({
               <Link
                 key={link.href}
                 href={link.href}
-                className="block rounded-lg px-3 py-2 text-[#667085] hover:bg-white"
+                className="block rounded-lg px-3 py-2 text-[#667085] transition-colors hover:bg-white"
               >
                 {link.label}
               </Link>
