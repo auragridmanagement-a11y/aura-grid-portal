@@ -5,11 +5,15 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
-  background: #f5f4f0;
-  color: #111827;
-  font-family: Arial, Helvetica, sans-serif;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  background: #f5f4f0 !important;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+  pointer-events: auto;
+  opacity: 1;
 }
