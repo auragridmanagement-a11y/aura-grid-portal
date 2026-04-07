@@ -1,76 +1,88 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import supabase from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
-type DashboardStats = {
-  pending: number;
-  approved: number;
-  revision: number;
-  total: number;
+type ClientUser = {
+  email?: string;
 };
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<DashboardStats>({
-    pending: 0,
-    approved: 0,
-    revision: 0,
-    total: 0,
-  });
-
-  async function fetchStats() {
-    const { data } = await supabase
-      .from("content_approvals")
-      .select("status");
-
-    const pending =
-      data?.filter((item) => item.status === "Pending Approval").length || 0;
-
-    const approved =
-      data?.filter((item) => item.status === "Approved").length || 0;
-
-    const revision =
-      data?.filter((item) => item.status === "Needs Revision").length || 0;
-
-    setStats({
-      pending,
-      approved,
-      revision,
-      total: data?.length || 0,
-    });
-  }
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<ClientUser | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
 
   useEffect(() => {
-    fetchStats();
-  }, []);
+    let mounted = true;
+
+    const loadDashboard = async () => {
+      try {
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser();
+
+        if (!mounted) return;
+
+        if (error || !user) {
+          router.push("/login");
+          return;
+        }
+
+        setUser({
+          email: user.email,
+        });
+      } catch (error) {
+        console.error("Dashboard auth error:", error);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    loadDashboard();
+
+    return () => {
+      mounted = false;
+    };
+  }, [router, supabase]);
+
+  if (loading) {
+    return (
+      <div className="grid gap-6 md:grid-cols-3">
+        {[1, 2, 3].map((item) => (
+          <div
+            key={item}
+            className="h-32 animate-pulse rounded-2xl border border-white/10 bg-white/5"
+          />
+        ))}
+      </div>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-zinc-50 p-6">
-      <h1 className="mb-8 text-3xl font-bold text-zinc-900">
-        Aura Grid Client Dashboard
+    <div className="space-y-6">
+      <h1 className="text-2xl font-semibold text-white">
+        Welcome back{user?.email ? `, ${user.email}` : ""}
       </h1>
 
-      <div className="grid gap-6 md:grid-cols-4">
-        <div className="rounded-3xl bg-white p-6 shadow-sm border">
-          <p className="text-sm text-zinc-500">Pending Approvals</p>
-          <h2 className="mt-2 text-4xl font-bold">{stats.pending}</h2>
+      <div className="grid gap-6 md:grid-cols-3">
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10">
+          <p className="text-sm text-white/60">Projects</p>
+          <p className="mt-2 text-3xl font-bold text-white">12</p>
         </div>
 
-        <div className="rounded-3xl bg-white p-6 shadow-sm border">
-          <p className="text-sm text-zinc-500">Approved</p>
-          <h2 className="mt-2 text-4xl font-bold">{stats.approved}</h2>
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10">
+          <p className="text-sm text-white/60">Active Clients</p>
+          <p className="mt-2 text-3xl font-bold text-white">08</p>
         </div>
 
-        <div className="rounded-3xl bg-white p-6 shadow-sm border">
-          <p className="text-sm text-zinc-500">Needs Revision</p>
-          <h2 className="mt-2 text-4xl font-bold">{stats.revision}</h2>
-        </div>
-
-        <div className="rounded-3xl bg-white p-6 shadow-sm border">
-          <p className="text-sm text-zinc-500">Total Content</p>
-          <h2 className="mt-2 text-4xl font-bold">{stats.total}</h2>
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10">
+          <p className="text-sm text-white/60">Pending Tasks</p>
+          <p className="mt-2 text-3xl font-bold text-white">21</p>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
