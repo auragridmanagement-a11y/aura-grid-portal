@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { headers } from "next/headers";
+
 const links = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/calendar", label: "Content calendar" },
@@ -6,11 +9,14 @@ const links = [
   { href: "/packages", label: "Packages" },
 ];
 
-export default function PortalLayout({
+export default async function PortalLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname =
+    (await headers()).get("x-invoke-path") || "/dashboard";
+
   return (
     <main className="min-h-screen bg-[#f5f4f0] p-8">
       <div className="flex min-h-[700px] overflow-hidden rounded-2xl border border-[#e8e6e0] bg-white shadow-sm">
@@ -20,15 +26,22 @@ export default function PortalLayout({
             <p className="text-xs text-[#7A8394]">Client Portal</p>
 
             <nav className="mt-8 space-y-2 text-sm">
-              {links.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="block rounded-lg px-3 py-3 text-[#667085] active:bg-white"
-                >
-                  {link.label}
-                </a>
-              ))}
+              {links.map((link) => {
+                const active = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`block rounded-lg px-3 py-3 transition-colors ${
+                      active
+                        ? "bg-white font-medium text-[#111827]"
+                        : "text-[#667085] hover:bg-white"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </nav>
           </div>
 
