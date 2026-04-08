@@ -1,10 +1,37 @@
 import { supabase } from "../../../lib/supabase";
 
 export default async function InvoicesPage() {
-  const { data: invoices } = await supabase
+  const { data } = await supabase
     .from("invoices")
     .select("*")
     .order("id", { ascending: false });
+
+  const invoices =
+    data && data.length > 0
+      ? data
+      : [
+          {
+            id: 1,
+            title: "April 2026 Retainer",
+            due_date: "May 1, 2026",
+            amount: "14999",
+            status: "Due",
+          },
+          {
+            id: 2,
+            title: "Drone Shoot Add-on",
+            due_date: "One-time",
+            amount: "4999",
+            status: "Paid",
+          },
+          {
+            id: 3,
+            title: "UGC Creator Add-on",
+            due_date: "Apr 20, 2026",
+            amount: "2999",
+            status: "Pending",
+          },
+        ];
 
   return (
     <main className="min-h-screen text-white">
@@ -24,8 +51,9 @@ export default async function InvoicesPage() {
       </div>
 
       <div className="mt-10 space-y-5">
-        {invoices?.map((invoice) => {
+        {invoices.map((invoice) => {
           const paid = invoice.status === "Paid";
+          const pending = invoice.status === "Pending";
 
           return (
             <div
@@ -42,11 +70,14 @@ export default async function InvoicesPage() {
 
                 <div className="text-right">
                   <p className="text-4xl font-bold">₹{invoice.amount}</p>
+
                   <span
                     className={`mt-2 inline-block rounded-full px-4 py-2 text-sm ${
                       paid
                         ? "bg-emerald-500/20 text-emerald-300"
-                        : "bg-amber-500/20 text-amber-300"
+                        : pending
+                        ? "bg-amber-500/20 text-amber-300"
+                        : "bg-rose-500/20 text-rose-300"
                     }`}
                   >
                     {invoice.status}
