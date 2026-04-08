@@ -2,13 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard,
+  Calendar,
+  BarChart3,
+  FileText,
+  Package,
+} from "lucide-react";
 
-const links = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/calendar", label: "Content calendar" },
-  { href: "/analytics", label: "Analytics" },
-  { href: "/invoices", label: "Invoices" },
-  { href: "/packages", label: "Packages" },
+const menu = [
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Content calendar", href: "/content", icon: Calendar },
+  { label: "Analytics", href: "/analytics", icon: BarChart3 },
+  { label: "Invoices", href: "/invoices", icon: FileText },
+  { label: "Packages", href: "/packages", icon: Package },
 ];
 
 export default function PortalLayout({
@@ -19,42 +26,37 @@ export default function PortalLayout({
   const pathname = usePathname();
 
   return (
-    <main className="min-h-screen bg-[#f5f4f0] p-8">
-      <div className="flex min-h-[700px] overflow-hidden rounded-2xl border border-[#e8e6e0] bg-white shadow-sm">
-        <aside className="flex w-60 flex-col border-r border-[#e8e6e0] bg-[#f9f8f5] p-6">
-          <div>
-            <h1 className="text-sm font-semibold">Aura Grid</h1>
-            <p className="text-xs text-[#7A8394]">Client Portal</p>
+    <div className="min-h-screen bg-[#1f1f1f] text-white flex">
+      <aside className="w-80 border-r border-white/10">
+        <div className="p-10">
+          <h1 className="text-4xl font-bold">Aura Grid</h1>
+          <p className="text-white/60">Client Portal</p>
+        </div>
 
-            <nav className="mt-8 space-y-2 text-sm">
-              {links.map((link) => {
-                const active = pathname === link.href;
+        <nav className="space-y-2 px-4">
+          {menu.map((item) => {
+            const Icon = item.icon;
+            const active = pathname === item.href;
 
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`block rounded-lg px-3 py-3 transition-colors ${
-                      active
-                        ? "bg-white font-medium text-[#111827]"
-                        : "text-[#667085] hover:bg-white"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-4 rounded-xl px-5 py-4 transition-all ${
+                  active
+                    ? "bg-violet-500/10 text-violet-400 border-l-2 border-violet-500"
+                    : "hover:bg-white/5 text-white/70"
+                }`}
+              >
+                <Icon size={22} />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
 
-          <div className="mt-auto rounded-xl border border-[#e8e6e0] bg-white p-4">
-            <p className="font-medium">Chérie</p>
-            <p className="text-sm text-[#667085]">Starter plan</p>
-          </div>
-        </aside>
-
-        <section className="flex-1 p-8">{children}</section>
-      </div>
-    </main>
+      <main className="flex-1 p-8">{children}</main>
+    </div>
   );
 }

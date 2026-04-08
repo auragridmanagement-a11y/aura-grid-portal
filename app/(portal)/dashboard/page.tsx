@@ -1,48 +1,36 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { supabase } from "@/lib/supabase";
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
+  const { data: invoices } = await supabase.from("invoices").select("*");
+  const { data: approvals } = await supabase.from("approvals").select("*");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
+  const totalPlan = invoices?.[0]?.amount || 14999;
+  const pendingCount =
+    approvals?.filter((a) => a.status === "Pending").length || 0;
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-4xl font-semibold text-[#1F2937]">
-          Good morning, {user.email?.split("@")[0] || "Client"}
-        </h1>
+    <div>
+      <h1 className="text-5xl font-bold mb-8">Good morning, Chérie</h1>
 
-        <div className="rounded-full bg-[#EEF2FF] px-4 py-2 text-sm font-medium text-[#6366F1]">
-          April 2026
-        </div>
-      </div>
-
-      <div className="grid grid-cols-4 gap-4">
-        <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <p className="text-3xl font-semibold text-[#111827]">8</p>
-          <p className="text-sm text-[#6B7280]">Reels this month</p>
+      <div className="grid grid-cols-4 gap-6">
+        <div className="rounded-3xl bg-black/20 p-6">
+          <p className="text-5xl font-bold">8</p>
+          <p>Reels this month</p>
         </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <p className="text-3xl font-semibold text-[#111827]">3</p>
-          <p className="text-sm text-[#6B7280]">Pending approvals</p>
+        <div className="rounded-3xl bg-black/20 p-6">
+          <p className="text-5xl font-bold">{pendingCount}</p>
+          <p>Pending approvals</p>
         </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <p className="text-3xl font-semibold text-[#111827]">₹14,999</p>
-          <p className="text-sm text-[#6B7280]">Current plan</p>
+        <div className="rounded-3xl bg-black/20 p-6">
+          <p className="text-5xl font-bold">₹{totalPlan}</p>
+          <p>Current plan</p>
         </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <p className="text-3xl font-semibold text-[#111827]">Due May 1</p>
-          <p className="text-sm text-[#6B7280]">Next invoice</p>
+        <div className="rounded-3xl bg-black/20 p-6">
+          <p className="text-5xl font-bold">May 1</p>
+          <p>Next invoice</p>
         </div>
       </div>
     </div>
